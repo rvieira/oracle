@@ -1,0 +1,1 @@
+strace -fyye trace=socket,setsockopt sqlplus / as sysdba

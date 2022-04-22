@@ -1,0 +1,9 @@
+1- Check Platform Support And File Conversion Requirement
+2- Identify Tablespaces To Be Transported And Verify Self-Containment
+3- Check For Problematic Data Types
+4- Check For Missing Schemas And Duplicate Tablespace And Object Names
+5- Make Tablespaces Read-Only In Source Database
+6- Extract Metadata From Source Database
+7- Copy Files To Target Server And Convert If Necessary 
+8- Import Metadata Into Target Database
+9- Copy Additional Objects To Target Database As Desired
