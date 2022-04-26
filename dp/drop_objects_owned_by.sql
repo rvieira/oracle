@@ -1,8 +1,4 @@
-undefine owner
-set pages 0
-set lines 300
-set heading off
-spool /tmp/qwe123.sql
+set pages 0 lines 300 heading off
 select 'drop table '||owner||'.'||table_name||' cascade constraints purge;'
 from dba_tables
 where owner = upper('&&owner')
@@ -14,7 +10,4 @@ and object_type not like '%LINK%'
 and object_type not like '%PARTITION%'
 and owner = upper('&&owner')
 order by 1;
-spool off
-@/tmp/qwe123
-PROMPT Count of Objects =
-select object_type,count(*) from dba_objects where owner = upper('&&owner') group by object_type;
+--select object_type,count(*) from dba_objects where owner = upper('&&owner') group by object_type;
