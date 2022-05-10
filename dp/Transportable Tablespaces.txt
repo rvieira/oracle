@@ -1,0 +1,6 @@
+Transportable Tablespaces feature exists since Oracle 8i
+– Can be used cross version ,Version to transport to must be always equal or higher
+– Cross platform Transportable Tablespaces got introduced in Oracle Database 10g
+==> Can be used cross version and cross platform
+==> Required tablespaces to be in read-only mode
+==> Extra work necessary for everything in SYSTEM/SYSAUX

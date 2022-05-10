@@ -1,0 +1,1 @@
+curl -T <path_and_filename>” -u “<userID>” https://transport.oracle.com/upload/issue/<sr_number>/
