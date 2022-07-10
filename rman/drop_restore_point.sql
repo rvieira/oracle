@@ -1,0 +1,1 @@
+DROP RESTORE POINT &restore_point_name;

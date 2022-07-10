@@ -1,0 +1,1 @@
+ALTER USER <user> quota unlimited on <tablespace name>;

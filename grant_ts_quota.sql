@@ -1,0 +1,1 @@
+ALTER USER <username> QUOTA 1024M ON <tablespace name>;
