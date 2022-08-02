@@ -1,0 +1,8 @@
+-- Reclaim FRA space
+
+backup as compressed backupset archivelog all delete all input;
+crosscheck backupset;
+crosscheck archivelog all;
+delete noprompt expired backupset;
+delete noprompt expired archivelog all;
+delete noprompt obsolete;
