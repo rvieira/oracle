@@ -1,0 +1,10 @@
+select
+  recovery_mode,
+  database_mode,
+  type,
+  status
+from
+  v$1og_archive_dest_status
+where 
+  dest_id=2
+  /

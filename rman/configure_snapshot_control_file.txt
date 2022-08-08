@@ -1,0 +1,4 @@
+show all for db_unique_name all;
+
+RMAN> configure snapshot controlfile name to '+FRA1/snapcf_<db_name>.f';
+new RMAN configuration parameters are successfully stored

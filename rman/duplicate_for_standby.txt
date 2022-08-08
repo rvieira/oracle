@@ -1,0 +1,4 @@
+dateNOW=$(date +%Y%m%d%H%M%S)
+nohup rman cmfile=clone_XXX.cmd debug all trace=rman_${HOSTNAME}_${ORACLE_SID}_${dateNOW}.trc log=rman_duplicate_${ORACLE_SID}_${dateNOW}.log &
+
+-- command file: connect target; connect auxiliary; run{allocate channels; allocate auxiliary channels; duplicate target database for standby from active database; release channels; }exit;

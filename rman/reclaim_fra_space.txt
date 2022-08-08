@@ -1,4 +1,9 @@
 -- Reclaim FRA space
+show all;
+
+### configure default device type to disk;
+### configure channel device type disk format '/db_dumps/oracle/%d/rman/arch_only_disk_%n_%s_%U_%T';
+### configure controlfile autobackup format for device type disk to '/db_dumps/oracle/%d/rman/arch_only_disk_%n_%F';
 
 backup as compressed backupset archivelog all delete all input;
 crosscheck backupset;
