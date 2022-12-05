@@ -1,0 +1,6 @@
+CONTINUE_CLIENT : Switch back to the normal client, with the log output echoed to the screen again.
+EXIT_CLIENT : The client is closed, but the database job continues, so the operation completes as normal.
+KILL_JOB : Detaches all clients and kills the database job.
+STOP_JOB : By default, the current actions are completed, then the job is stopped. It can be resumed later. If you use the STOP_JOB=IMMEDIATE option, all actions are stopped immediately. When the job resumed, some of those actions will need to be rerun to make the action consistent.
+START_JOB : Restarts a stopped job.
+STATUS : Displays basic information about the job, including the status of the workers.
