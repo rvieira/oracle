@@ -19,6 +19,6 @@ column TIME COMPUTED format a30 wrap
 column DATUM TIME format a30 wrap
 select INST_ID,db_unique_name,name,database_role,open_mode,switchover_status from gv$database;
 select INST_ID,NAME,value,UNIT,TIME_COMPUTED,DATUM_TIME from gv$dataguard stats;
-SELECT INST_ID,dest_id,status,database_mode,recovery mode FROM g$archive dest status WHERE status <> 'INACTIVE'
-SELECT INST_ID,PROCESS,STATUS,SEQUENCE# FROM GV$MANAGED STANDBY;
-select PROCESS, CLIENT _PROCESS, THREAD#, SEQUENCE#, BLOCK# from gv$managed standby where process = 'MRPO' or client process='LGWR
+SELECT INST_ID,dest_id,status,database_mode,recovery_mode FROM g$archive_dest status WHERE status <> 'INACTIVE';
+SELECT INST_ID,PROCESS,STATUS,SEQUENCE# FROM GV$MANAGED_STANDBY;
+select PROCESS, CLIENT _PROCESS, THREAD#, SEQUENCE#, BLOCK# from gv$managed_standby where process = 'MRPO' or client_process='LGWR';
