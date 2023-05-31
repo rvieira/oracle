@@ -11,14 +11,14 @@ WHERE name IN
 order by name, inst_id;
 
 -- Standby Database Status
-column INST ID format 9;
+column INST_ID format 9;
 column NAME format a22 wrap
 column VALUE format a30 wrap
 column UNIT format a30 wrap
-column TIME COMPUTED format a30 wrap
-column DATUM TIME format a30 wrap
+column TIME_COMPUTED format a30 wrap
+column DATUM_TIME format a30 wrap
 select INST_ID,db_unique_name,name,database_role,open_mode,switchover_status from gv$database;
-select INST_ID,NAME,value,UNIT,TIME_COMPUTED,DATUM_TIME from gv$dataguard stats;
-SELECT INST_ID,dest_id,status,database_mode,recovery_mode FROM g$archive_dest status WHERE status <> 'INACTIVE';
+select INST_ID,NAME,value,UNIT,TIME_COMPUTED,DATUM_TIME from gv$dataguard_stats;
+SELECT INST_ID,dest_id,status,database_mode,recovery_mode FROM gv$archive_dest status WHERE status <> 'INACTIVE';
 SELECT INST_ID,PROCESS,STATUS,SEQUENCE# FROM GV$MANAGED_STANDBY;
 select PROCESS, CLIENT _PROCESS, THREAD#, SEQUENCE#, BLOCK# from gv$managed_standby where process = 'MRPO' or client_process='LGWR';
