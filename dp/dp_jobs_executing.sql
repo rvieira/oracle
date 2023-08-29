@@ -1,0 +1,1 @@
+select owner_name, job_name from dba_datapump_jobs where state='EXECUTING';
