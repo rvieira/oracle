@@ -1,0 +1,1 @@
+select con_id, pdb, network_name from cdb_services where pdb is not null and con_id > 2 order by pdb;
