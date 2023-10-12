@@ -1,0 +1,1 @@
+alter daabase archive log off;
