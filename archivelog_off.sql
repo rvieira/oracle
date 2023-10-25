@@ -1,1 +1,1 @@
-alter daabase archive log off;
+alter database archive log off;
