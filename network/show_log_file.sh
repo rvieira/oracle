@@ -1,0 +1,1 @@
+lsnrctl show log_file
