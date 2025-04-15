@@ -42,7 +42,7 @@ if [ ! -f "$HOST_LIST" ]; then
     exit 1
 fi
 # Check if the group exists
-if ! emcli get_groups -name="${GROUP_NAME}" &> /dev/null; then
+if ! emcli get_groups | grep -q "^${GROUP_NAME}$"; then
     echo "Group not found: $GROUP_NAME"
     exit 1
 fi
@@ -51,7 +51,7 @@ while IFS= read -r host; do
     # Check if the host is reachable
     if ping -c 1 "$host" &> /dev/null; then
         # Add the host to the group
-        emcli add_target_to_group -group_name="${GROUP_NAME}" -targets="${host}:host"
+        emcli modify_group -name="${GROUP_NAME}" -targets="${host}:host"
         if [ $? -eq 0 ]; then
             echo "Added $host to group $GROUP_NAME"
         else
