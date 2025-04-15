@@ -39,5 +39,5 @@ if [ $# -lt 1 ]; then
     usage
 else
     GROUP_NAME=$1
-    emcli create_group -name "${GROUP_NAME}"
+    emcli create_group -name="${GROUP_NAME}"
 fi
