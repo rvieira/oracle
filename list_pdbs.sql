@@ -1,0 +1,1 @@
+SELECT pdb_id, pdb_name, status FROM dba_pdbs;
