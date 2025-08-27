@@ -1,0 +1,2 @@
+SELECT sum(value)/1024/1024 AS total_sga_mb
+FROM v$sga;
