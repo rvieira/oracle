@@ -4,4 +4,5 @@ FROM v$asm_diskgroup;
 
 -- Check disks in the group
 SELECT group_number, disk_number, name, path, header_status, mount_status 
-FROM v$asm_disk;
+FROM v$asm_disk
+order by group_number, name;
