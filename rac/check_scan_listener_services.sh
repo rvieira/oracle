@@ -1,0 +1,3 @@
+lsnrctl services LISTENER_SCAN1
+lsnrctl services LISTENER_SCAN2
+lsnrctl services LISTENER_SCAN3
