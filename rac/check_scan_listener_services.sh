@@ -69,6 +69,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ $auto -eq 1 && ${#listeners[@]} -gt 0 ]]; then
+  die "--all and --listener are mutually exclusive"
+fi
+
 if [[ ${#listeners[@]} -eq 0 ]]; then
   auto=1
 fi
