@@ -1,0 +1,1 @@
+srvctl add service -db ORCL -service SALES
