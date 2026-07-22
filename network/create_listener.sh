@@ -10,7 +10,7 @@ ORACLE_HOME="${ORACLE_HOME:-/u01/app/oracle/product/19c/dbhome_1}"
 ORACLE_BASE="${ORACLE_BASE:-/u01/app/oracle}"
 LISTENER_NAME="${LISTENER_NAME:-LISTENER}"
 LISTENER_PORT="${LISTENER_PORT:-1521}"
-LISTENER_HOST="${LISTENER_HOST:-$(hostname -f)}"
+LISTENER_HOST="${LISTENER_HOST:-$(hostname -f 2>/dev/null || hostname)}"
 ORACLE_SID="${ORACLE_SID:-ORCL}"
 LISTENER_ORA="${ORACLE_HOME}/network/admin/listener.ora"
 TNSNAMES_ORA="${ORACLE_HOME}/network/admin/tnsnames.ora"
@@ -30,6 +30,9 @@ die()  { echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') $*" >&2; exit 1; }
 # ---------------------------------------------------------------------------
 [[ -d "${ORACLE_HOME}" ]] || die "ORACLE_HOME not found: ${ORACLE_HOME}"
 command -v lsnrctl &>/dev/null  || die "lsnrctl not found – check ORACLE_HOME/PATH"
+[[ -n "${LISTENER_NAME}" ]] || die "LISTENER_NAME must not be empty"
+[[ -n "${ORACLE_SID}" ]] || die "ORACLE_SID must not be empty"
+[[ "${LISTENER_PORT}" =~ ^[0-9]+$ ]] || die "LISTENER_PORT must be numeric: ${LISTENER_PORT}"
 
 # ---------------------------------------------------------------------------
 # Build listener.ora
@@ -69,10 +72,11 @@ log "Updating ${TNSNAMES_ORA}"
 touch "${TNSNAMES_ORA}"
 
 # Remove previous entry for this SID if it exists
-if grep -q "^${ORACLE_SID}" "${TNSNAMES_ORA}" 2>/dev/null; then
+SID_PATTERN="$(printf '%s' "${ORACLE_SID}" | sed 's/[.[\*^$()+?{|]/\\&/g')"
+if grep -Eq "^${SID_PATTERN}[[:space:]]*=" "${TNSNAMES_ORA}" 2>/dev/null; then
     warn "Existing entry for ${ORACLE_SID} found in tnsnames.ora – replacing it"
     # Remove the block belonging to this SID (simple single-entry removal)
-    sed -i "/^${ORACLE_SID}/,/^$/d" "${TNSNAMES_ORA}"
+    sed -i "/^${SID_PATTERN}[[:space:]]*=/,/^$/d" "${TNSNAMES_ORA}"
 fi
 
 cat >> "${TNSNAMES_ORA}" <<EOF
