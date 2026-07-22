@@ -10,7 +10,7 @@ ORACLE_HOME="${ORACLE_HOME:-/u01/app/oracle/product/19c/dbhome_1}"
 ORACLE_BASE="${ORACLE_BASE:-/u01/app/oracle}"
 LISTENER_NAME="${LISTENER_NAME:-LISTENER}"
 LISTENER_PORT="${LISTENER_PORT:-1521}"
-LISTENER_HOST="${LISTENER_HOST:-$(hostname -f)}"
+LISTENER_HOST="${LISTENER_HOST:-$(hostname -f 2>/dev/null || hostname)}"
 ORACLE_SID="${ORACLE_SID:-ORCL}"
 LISTENER_ORA="${ORACLE_HOME}/network/admin/listener.ora"
 TNSNAMES_ORA="${ORACLE_HOME}/network/admin/tnsnames.ora"
@@ -30,6 +30,9 @@ die()  { echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') $*" >&2; exit 1; }
 # ---------------------------------------------------------------------------
 [[ -d "${ORACLE_HOME}" ]] || die "ORACLE_HOME not found: ${ORACLE_HOME}"
 command -v lsnrctl &>/dev/null  || die "lsnrctl not found – check ORACLE_HOME/PATH"
+[[ -n "${LISTENER_NAME}" ]] || die "LISTENER_NAME must not be empty"
+[[ -n "${ORACLE_SID}" ]] || die "ORACLE_SID must not be empty"
+[[ "${LISTENER_PORT}" =~ ^[0-9]+$ ]] || die "LISTENER_PORT must be numeric: ${LISTENER_PORT}"
 
 # ---------------------------------------------------------------------------
 # Build listener.ora
@@ -69,10 +72,63 @@ log "Updating ${TNSNAMES_ORA}"
 touch "${TNSNAMES_ORA}"
 
 # Remove previous entry for this SID if it exists
-if grep -q "^${ORACLE_SID}" "${TNSNAMES_ORA}" 2>/dev/null; then
+if awk -v sid="${ORACLE_SID}" '
+  BEGIN { found = 0 }
+  {
+    line = $0
+    sub(/^[[:space:]]+/, "", line)
+    if (index(line, sid) == 1) {
+      rest = substr(line, length(sid) + 1)
+      if (rest ~ /^[[:space:]]*=/) {
+        found = 1
+        exit 0
+      }
+    }
+  }
+  END { exit(found ? 0 : 1) }
+' "${TNSNAMES_ORA}" 2>/dev/null; then
     warn "Existing entry for ${ORACLE_SID} found in tnsnames.ora – replacing it"
     # Remove the block belonging to this SID (simple single-entry removal)
-    sed -i "/^${ORACLE_SID}/,/^$/d" "${TNSNAMES_ORA}"
+    tns_dir="$(dirname "${TNSNAMES_ORA}")"
+    if original_mode="$(stat -c '%a' "${TNSNAMES_ORA}" 2>/dev/null)"; then
+      :
+    elif original_mode="$(stat -f '%Lp' "${TNSNAMES_ORA}" 2>/dev/null)"; then
+      :
+    else
+      die "Failed to determine permissions for ${TNSNAMES_ORA}"
+    fi
+    old_umask="$(umask)"
+    umask 077
+    tmp_tns="$(mktemp "${tns_dir}/.tnsnames.tmp.XXXXXX")" || die "Failed to create temporary file for ${TNSNAMES_ORA}"
+    umask "${old_umask}"
+    trap 'rm -f "${tmp_tns:-}"' EXIT INT TERM
+    awk -v sid="${ORACLE_SID}" '
+      BEGIN { skip = 0 }
+      {
+        line = $0
+        trimmed = line
+        sub(/^[[:space:]]+/, "", trimmed)
+        if (!skip && index(trimmed, sid) == 1) {
+          rest = substr(trimmed, length(sid) + 1)
+          if (rest ~ /^[[:space:]]*=/) {
+            skip = 1
+            next
+          }
+        }
+        if (skip) {
+          # TNS aliases are expected at column 1, e.g. ORCL =
+          if (line ~ /^[[:alnum:]_]([[:alnum:]_.-]*[[:alnum:]_])?[[:space:]]*=/) {
+            skip = 0
+          } else {
+            next
+          }
+        }
+        print line
+      }
+    ' "${TNSNAMES_ORA}" > "${tmp_tns}"
+    mv "${tmp_tns}" "${TNSNAMES_ORA}" || die "Failed to update ${TNSNAMES_ORA}"
+    chmod "${original_mode}" "${TNSNAMES_ORA}" || die "Failed to restore permissions on ${TNSNAMES_ORA}"
+    trap - EXIT INT TERM
 fi
 
 cat >> "${TNSNAMES_ORA}" <<EOF
