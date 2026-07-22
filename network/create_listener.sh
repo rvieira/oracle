@@ -89,7 +89,7 @@ if awk -v sid="${ORACLE_SID}" '
 ' "${TNSNAMES_ORA}" 2>/dev/null; then
     warn "Existing entry for ${ORACLE_SID} found in tnsnames.ora – replacing it"
     # Remove the block belonging to this SID (simple single-entry removal)
-    tns_dir="$(dirname -- "${TNSNAMES_ORA}")"
+    tns_dir="$(dirname "${TNSNAMES_ORA}")"
     if original_mode="$(stat -c '%a' "${TNSNAMES_ORA}" 2>/dev/null)"; then
       :
     elif original_mode="$(stat -f '%Lp' "${TNSNAMES_ORA}" 2>/dev/null)"; then
@@ -97,7 +97,10 @@ if awk -v sid="${ORACLE_SID}" '
     else
       die "Failed to determine permissions for ${TNSNAMES_ORA}"
     fi
-    tmp_tns="$(umask 077 && mktemp "${tns_dir}/.tnsnames.tmp.XXXXXX")" || die "Failed to create temporary file for ${TNSNAMES_ORA}"
+    old_umask="$(umask)"
+    umask 077
+    tmp_tns="$(mktemp "${tns_dir}/.tnsnames.tmp.XXXXXX")" || die "Failed to create temporary file for ${TNSNAMES_ORA}"
+    umask "${old_umask}"
     trap 'rm -f "${tmp_tns:-}"' EXIT INT TERM
     awk -v sid="${ORACLE_SID}" '
       BEGIN { skip = 0 }
@@ -114,7 +117,7 @@ if awk -v sid="${ORACLE_SID}" '
         }
         if (skip) {
           # TNS aliases are expected at column 1, e.g. ORCL =
-          if (line ~ /^[[:alnum:]_][[:alnum:]_.-]*[[:space:]]*=/) {
+          if (line ~ /^[[:alnum:]_]([[:alnum:]_.-]*[[:alnum:]_])?[[:space:]]*=/) {
             skip = 0
           } else {
             next
