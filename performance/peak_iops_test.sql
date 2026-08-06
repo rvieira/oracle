@@ -317,8 +317,8 @@ FROM result;
 
 -- ---------------------------------------------------------------------------
 -- TEST 7: Decimal precision – ROUND to 2 decimal places
---   read maxval=333, write maxval=100 → total=433 (all integers, verify rounding)
---   read maxval=10.567 (simulate via division), total should be rounded
+--   read maxval=10.567, write maxval=5.123 → total=15.690
+--   Expect: max_read_iops=10.57, max_write_iops=5.12, max_total_iops=15.69
 -- ---------------------------------------------------------------------------
 WITH src AS (
     SELECT TIMESTAMP '2026-07-06 00:00:00' AS begin_time,
